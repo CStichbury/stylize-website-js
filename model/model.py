@@ -10,7 +10,7 @@ from torchvision import transforms
 from torchvision.utils import save_image
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-WEIGHTS_FOLDER = Path(__file__).parent / 'weights'
+WEIGHTS_FOLDER = Path(__file__).parent / 'weights' / 'torch'
 
 def calc_mean_std(feat, eps=1e-5):
     # eps is a small value added to the variance to avoid divide-by-zero.
