@@ -1,3 +1,15 @@
+## Custom
+static
+sample_projects
+model/weights
+app
+
+
+
+
+
+
+
 # Logs
 logs
 *.log
