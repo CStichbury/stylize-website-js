@@ -174,7 +174,7 @@ class Transform(nn.Module):
             self.sanet4_1(content4_1, style4_1) + 
             self.upsample5_1(self.sanet5_1(content5_1, style5_1))
             )
-        )
+        ).reshape(1,512,64,64)
 
 def test_transform():
     transform_list = []
@@ -193,8 +193,8 @@ class Encoder(nn.Module):
             *list(full_encoder.children())[31:44]
         )
     def forward(self, image):
-        enc_4 = self.enc_4(image)
-        enc_5 = self.enc_5(enc_4)
+        enc_4 = self.enc_4(image).reshape(1,512,64,64)
+        enc_5 = self.enc_5(enc_4).reshape(1,512,32,32)
         return enc_4, enc_5
     
 class Decoder(nn.Module):
@@ -205,10 +205,11 @@ class Decoder(nn.Module):
             *list(full_decoder.children())[:44]
         )
     def forward(self, image):
-        return self.decoder(image)
+        return self.decoder(image).reshape(1,3,512,512)
 
 
 import matplotlib.pyplot as plt
+
 class Stylizer(nn.Module):
     def __init__(self):
         super().__init__()

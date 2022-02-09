@@ -66,10 +66,10 @@ async function getImage(id) {
     const normalized = img.div(offset);
 
     // Reshape to a single-element batch so we can pass it to predict.
-    const batched = normalized.reshape([1, IMAGE_SIZE, IMAGE_SIZE, 3]);
-    const ncwh = tf.transpose(batched, [0, 3, 1, 2]);
+    const batched = normalized.reshape([IMAGE_SIZE, IMAGE_SIZE, 3]);
+    // const ncwh = tf.transpose(batched, [0, 3, 1, 2]);
 
-    return ncwh
+    return batched
 }
 
 
@@ -78,6 +78,7 @@ async function main() {
     try {
         const content = await getImage('content')
         const style = await getImage('style')
+        const iters = tf.scalar(2,dtype='int32')
         console.log(content, style);
         console.log('Images loaded successfully!');
         
@@ -85,7 +86,7 @@ async function main() {
         // const decoder = await tf.loadGraphModel('static/tfjs/decoder/model.json');
         // const trfm = await tf.loadGraphModel('static/tfjs/transform/model.json');
         const model = await tf.loadGraphModel('experimental_jssave/model.json');
- 
+
         console.log('Model loaded successfully!');
         
         console.log(model);
@@ -94,26 +95,22 @@ async function main() {
 
         await model.executeAsync(
             {
-                'content':tf.zeros([IMAGE_SIZE, IMAGE_SIZE, 3],'float32'),
-                'style':tf.zeros([IMAGE_SIZE, IMAGE_SIZE, 3], 'float32'),
+                'content':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
+                'style':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
                 'iters':tf.scalar(2,'int32')
-            }
+            },
+            ["result"]
         ); 
         console.log('Model warmup successfull!');
-        let iters = 2; 
-        for (let iter = 0; iter < iters; iter++) {
-            console.log(`Iter: ${iter}...`);
-            let {out5_1:c5_1, out4_1:c4_1} = await encoder.run({'image':content})
-            let {out5_1:s5_1, out4_1:s4_1} = await encoder.run({'image':style})
-            let {c_tfm} = await trfm.run({c4_1,s4_1,c5_1,s5_1})
-            var {c_stylized} = await decoder.run({c_tfm})
-            
-            c4_1 = c_stylized
-            s4_1 = style
-            c4_1 = c4_1
-        }
-        console.log('done');
-        c_stylized
+        
+        const result = await model.executeAsync(
+            {content,style,iters},
+            ["result"]
+        ); 
+        console.log(result);
+        await tf.browser.toPixels(result, document.getElementById('result'));
+
+        return
 
         // const model = tf.sequential();
         // model.add(tf.layers.dense({units: 1000, activation: 'relu', inputShape: [10]}));
