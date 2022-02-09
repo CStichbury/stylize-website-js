@@ -81,15 +81,25 @@ async function main() {
         console.log(content, style);
         console.log('Images loaded successfully!');
         
-        const encoder = await tf.loadGraphModel('static/tfjs/encoder/model.json');
-        const decoder = await tf.loadGraphModel('static/tfjs/decoder/model.json');
-        const trfm = await tf.loadGraphModel('static/tfjs/transform/model.json');
+        // const encoder = await tf.loadGraphModel('static/tfjs/encoder/model.json');
+        // const decoder = await tf.loadGraphModel('static/tfjs/decoder/model.json');
+        // const trfm = await tf.loadGraphModel('static/tfjs/transform/model.json');
+        const model = await tf.loadGraphModel('experimental_jssave/model.json');
+ 
+        console.log('Model loaded successfully!');
         
+        console.log(model);
 
-        console.log('Models loaded successfully!');
-        console.log(encoder, decoder, trfm);
-        await encoder.predict({'image':tf.zeros([1, 3, IMAGE_SIZE, IMAGE_SIZE])});
-        
+        console.log('Starting model warmup...');
+
+        await model.executeAsync(
+            {
+                'content':tf.zeros([IMAGE_SIZE, IMAGE_SIZE, 3],'float32'),
+                'style':tf.zeros([IMAGE_SIZE, IMAGE_SIZE, 3], 'float32'),
+                'iters':tf.scalar(2,'int32')
+            }
+        ); 
+        console.log('Model warmup successfull!');
         let iters = 2; 
         for (let iter = 0; iter < iters; iter++) {
             console.log(`Iter: ${iter}...`);

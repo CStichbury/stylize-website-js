@@ -3,6 +3,8 @@ static
 sample_projects
 model/weights
 app
+*.onnx
+experimental*
 
 
 
