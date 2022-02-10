@@ -1,3 +1,19 @@
+## Custom
+static
+sample_projects
+model/weights
+app
+*.onnx
+experimental*
+onnx-tensorflow
+transform.tf2
+*.tf2
+models
+Untitled.ipynb
+
+
+
+
 # Logs
 logs
 *.log
