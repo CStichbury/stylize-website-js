@@ -1,81 +1,25 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-
-// const ort = require('onnxruntime-web');
-async function getImageTensorFromPath(path, dims = [1, 3, 256, 256]) {
-    // 1. load the image  
-    var image = await loadImageFromPath(path, dims[2], dims[3]);
-    // 2. convert to tensor
-    var imageTensor = imageDataToTensor(image, dims);
-    // 3. return the tensor
-    return imageTensor;
-  }
-  
-  async function loadImageFromPath(path, width = 224, height= 224) {
-    // Use Jimp to load the image and resize it.
-    var imageData = await Jimp.read(path)
-        .then((imageBuffer) => {
-      return imageBuffer.resize(width, height);
-    });
-  
-    return imageData;
-  }
-  
-  async function imageDataToTensor(image, dims) {
-    // 1. Get buffer data from image and create R, G, and B arrays.
-    var imageBufferData = image.bitmap.data;
-    const [redArray, greenArray, blueArray] = new Array(
-        new Array(),
-        new Array(), 
-        new Array()
-     );
-  
-    // 2. Loop through the image buffer and extract the R, G, and B channels
-    for (let i = 0; i < imageBufferData.length; i += 4) {
-        redArray.push(imageBufferData[i]);
-        greenArray.push(imageBufferData[i + 1]);
-        blueArray.push(imageBufferData[i + 2]);
-        // skip data[i + 3] to filter out the alpha channel
-    }
-
-    // 3. Concatenate RGB to transpose [224, 224, 3] -> [3, 224, 224] to a number array
-    const transposedData = redArray.concat(greenArray).concat(blueArray);
-
-    // 4. convert to float32
-    let i, l = transposedData.length; // length, we need this for the loop
-    // create the Float32Array size 3 * 224 * 224 for these dimensions output
-    const float32Data = new Float32Array(dims[1] * dims[2] * dims[3]);
-    for (i = 0; i < l; i++) {
-        float32Data[i] = transposedData[i] / 255.0; // convert to float
-    }
-    // 5. create the tensor object from onnxruntime-web.
-    const inputTensor = new ort.Tensor("float32", float32Data, dims);
-    return inputTensor;
-}
-
-
 const IMAGE_SIZE = 512
 
 async function getImage(id) {
-    const img = tf.cast(tf.browser.fromPixels(
-        document.getElementById(id)
-    ), 'float32');
+    let img = document.getElementById(id)
+    
+    img = tf.cast(tf.browser.fromPixels(img), 'float32');
 
     const offset = tf.scalar(255.0);
     // Normalize the image from [0, 255] to [0, 1].
-    const normalized = img.div(offset);
+    img = img.div(offset).reshape([IMAGE_SIZE, IMAGE_SIZE, 3]);
 
-    // Reshape to a single-element batch so we can pass it to predict.
-    const batched = normalized.reshape([IMAGE_SIZE, IMAGE_SIZE, 3]);
     // const ncwh = tf.transpose(batched, [0, 3, 1, 2]);
 
-    return batched
+    return img
 }
 
 
 // use an async context to call onnxruntime functions.
 async function main() {
     try {
+        // console.log(tf.getBackend());
+        console.log(tf.getBackend());
         const content = await getImage('content')
         const style = await getImage('style')
         const iters = tf.scalar(2,dtype='int32')
@@ -85,31 +29,32 @@ async function main() {
         // const encoder = await tf.loadGraphModel('static/tfjs/encoder/model.json');
         // const decoder = await tf.loadGraphModel('static/tfjs/decoder/model.json');
         // const trfm = await tf.loadGraphModel('static/tfjs/transform/model.json');
-        const model = await tf.loadGraphModel('experimental_jssave/model.json');
+        const model = await tf.loadGraphModel('static/model/model.json');
 
         console.log('Model loaded successfully!');
         
         console.log(model);
+        // return
+        // console.log('Starting model warmup...');
 
-        console.log('Starting model warmup...');
+        // await model.executeAsync(
+        //     {
+        //         'content':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
+        //         'style':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
+        //         'iters':tf.scalar(2,'int32')
+        //     },
+        //     ["result"]
+        // ); 
+        // console.log('Model warmup successfull!');
 
-        await model.executeAsync(
-            {
-                'content':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
-                'style':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
-                'iters':tf.scalar(2,'int32')
-            },
-            ["result"]
-        ); 
-        console.log('Model warmup successfull!');
-        
+        console.log('Doing stylization...');
         const result = await model.executeAsync(
             {content,style,iters},
             ["result"]
         ); 
         console.log(result);
-        await tf.browser.toPixels(result, document.getElementById('result'));
-
+        tf.browser.toPixels(result, document.getElementById('result'));
+        
         return
 
         // const model = tf.sequential();
@@ -220,5 +165,7 @@ async function main() {
         console.error(e);
     }
 }
+(async() => {
+   await main();
+})()
 
-main();

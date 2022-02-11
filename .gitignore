@@ -1,5 +1,5 @@
 ## Custom
-static
+# static
 sample_projects
 model/weights
 app
@@ -10,8 +10,6 @@ transform.tf2
 *.tf2
 models
 Untitled.ipynb
-
-
 
 
 # Logs
