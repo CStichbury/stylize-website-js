@@ -8,19 +8,25 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jimp/0.16.1/jimp.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.13.0/dist/tf.min.js"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgpu@0.0.1-alpha.8/dist/tf-backend-webgpu.min.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.js"></script>
- 
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-cpu"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite/dist/tf-tflite.min.js"></script>
         
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite/dist/tf-tflite.min.js"></script>
-
+        <link rel="stylesheet" href="static/css/main.css">
     </head>
     <body>
-        <img id="style" src="static/images/candy.jpg" alt="">
-        <img id="content" src="static/images/chicago.jpg" alt="">
-        <canvas id="result" alt="">
-
+        <form id="stylizeForm" action="javascript:beginStylization()">
+            <label for="styleInp">Select style:</label>
+            <input accept="image/*" type='file' id="styleInp" />
+            <img id="style"  height="256" width="256" src="static/images/candy.jpg" alt=""/>
+            <br>
+            <label for="contentInp">Select content:</label>
+            <input accept="image/*" type='file' id="contentInp" />        
+            <img id="content" height="256" width="256" src="static/images/chicago.jpg" alt="" />
+            <br>
+            <input type="submit" value="Stylize! (might take a while)" id='stylizeBtn'>
+        </form>
+        <div id="loadingScreen" class="loader" style="display:none;"></div>
+        <canvas id="result" height="256" width="256" alt="">
         <script src="index.js"></script>        
     </body>
 </html>
