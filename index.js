@@ -1,4 +1,5 @@
-const IMAGE_SIZE = 512
+
+let model = null;
 
 async function getImage(id) {
     let img = document.getElementById(id)
@@ -7,55 +8,57 @@ async function getImage(id) {
 
     const offset = tf.scalar(255.0);
     // Normalize the image from [0, 255] to [0, 1].
-    img = img.div(offset)//.reshape([IMAGE_SIZE, IMAGE_SIZE, 3]);
-
-    // const ncwh = tf.transpose(batched, [0, 3, 1, 2]);
-
+    img = img.div(offset)
     return img
 }
 
 
-// use an async context to call onnxruntime functions.
+async function loadModel() {
+    if (model === null) {
+        model = await tf.loadGraphModel('static/model/model.json');
+        // Model warmup.
+        await model.executeAsync(
+            {
+                'content':tf.randomUniform([256,256,3], dtype ='float32'),
+                'style':tf.randomUniform([256,256,3], dtype ='float32'),
+                'iters':tf.scalar(1,'int32'),
+                'max_resolution':tf.scalar(128,'int32'),
+            },
+            ["result"]
+        ); 
+    }
+    return model
+}
+
+
 async function stylize() {
     try {
-        // console.log(tf.getBackend());
         console.log(tf.getBackend());
         const content = await getImage('content')
         const style = await getImage('style')
-        const iters = tf.scalar(1,dtype='int32')
+        const iters = tf.scalar(
+            document.getElementById('iters').value, 
+            dtype='int32')
+        const max_resolution = tf.scalar(
+            document.getElementById('max_resolution').value,
+            dtype='int32')
+        
         console.log(content, style);
         console.log('Images loaded successfully!');
-        // const encoder = await tf.loadGraphModel('static/tfjs/encoder/model.json');
-        // const decoder = await tf.loadGraphModel('static/tfjs/decoder/model.json');
-        // const trfm = await tf.loadGraphModel('static/tfjs/transform/model.json');
-        const model = await tf.loadGraphModel('static/model/model.json');
+
+        const model = await loadModel();
 
         console.log('Model loaded successfully!');
         
         console.log(model);
-        // return
-        // console.log('Starting model warmup...');
-
-        // await model.executeAsync(
-        //     {
-        //         'content':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
-        //         'style':tf.randomUniform([IMAGE_SIZE, IMAGE_SIZE, 3], dtype ='float32'),
-        //         'iters':tf.scalar(2,'int32')
-        //     },
-        //     ["result"]
-        // ); 
-        // console.log('Model warmup successfull!');
-
         console.log('Doing stylization...');
         const result = await model.executeAsync(
-            {content,style,iters},
+            {content,style,iters,max_resolution},
             ["result"]
         ); 
         console.log(result);
-        tf.browser.toPixels(result, document.getElementById('result'));
-        
+        await tf.browser.toPixels(result, document.getElementById('result'));
     } catch (e) {
-        // document.write(`failed to inference ONNX model: ${e}.`);
         console.error(e);
     }
 
@@ -77,21 +80,16 @@ contentInp.onchange = evt => {
     }
 }
 
-function showDiv() {
-    document.getElementById('Login').style.display = "none";
-    document.getElementById('loadingGif').style.display = "block";
-    setTimeout(function() {
-      document.getElementById('loadingGif').style.display = "none";
-      document.getElementById('showme').style.display = "block";
-    },2000);
-}
-
-async function beginStylization() {
+function beginStylization() {
     let btn = document.getElementById("stylizeBtn")
     let btnText = btn.value
     btn.value = "Wait a moment. Stylizing..."
     document.getElementById("loadingScreen").style.display = "block";
-    await stylize()
-    document.getElementById("loadingScreen").style.display = "none";
-    btn.value = btnText
+    btn.disabled = true;
+    stylize().then(() => {
+        document.getElementById("loadingScreen").style.display = "none";
+        btn.disabled = false;
+        btn.value = btnText
+        }    
+    )
 }
