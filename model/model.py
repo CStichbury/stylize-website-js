@@ -43,17 +43,20 @@ class SANet(nn.Module):
         G = self.g(mean_variance_norm(style))
         H = self.h(style)
 
-        b, c, h, w = F.size()
-        F = F.view(b, -1, w * h).permute(0, 2, 1)
-
-        b, c, h, w = G.size()
-        G = G.view(b, -1, w * h)
+        # b, c, h, w = F.size()
+        # F = F.view(F.size(0), -1, F.size(2) * F.size(3)).permute(0, 2, 1)
+        F = torch.flatten(F, 2).permute(0,2,1)
+        # b, c, h, w = G.size()
+        # G = G.view(G.size(0), -1, G.size(2) * G.size(3))
+        G = torch.flatten(G, 2)
 
         S = torch.bmm(F, G)
+        # S = torch.einsum('bijc,bklc->bijkl', F, G)
         S = self.sm(S)
 
-        b, c, h, w = H.size()
-        H = H.view(b, -1, w * h)
+        # b, c, h, w = H.size()
+        # H = H.view(H.size(0), -1, H.size(2) * H.size(3))
+        H = torch.flatten(H, 2)
 
         O = torch.bmm(H, S.permute(0, 2, 1))
         b, c, h, w = content.size()
@@ -170,11 +173,11 @@ class Transform(nn.Module):
         self.merge_conv_pad = nn.ReflectionPad2d((1, 1, 1, 1))
         self.merge_conv = nn.Conv2d(in_planes, in_planes, (3, 3))
     def forward(self, content4_1, style4_1, content5_1, style5_1):
+        a =  self.sanet4_1(content4_1, style4_1)
+        b = self.upsample5_1(self.sanet5_1(content5_1, style5_1))
+        print(a.shape, b.shape)
         return self.merge_conv(self.merge_conv_pad(
-            self.sanet4_1(content4_1, style4_1) + 
-            self.upsample5_1(self.sanet5_1(content5_1, style5_1))
-            )
-        ).reshape(1,512,64,64)
+            a + b))
 
 def test_transform():
     transform_list = []
@@ -193,8 +196,8 @@ class Encoder(nn.Module):
             *list(full_encoder.children())[31:44]
         )
     def forward(self, image):
-        enc_4 = self.enc_4(image).reshape(1,512,64,64)
-        enc_5 = self.enc_5(enc_4).reshape(1,512,32,32)
+        enc_4 = self.enc_4(image)
+        enc_5 = self.enc_5(enc_4)
         return enc_4, enc_5
     
 class Decoder(nn.Module):
@@ -205,7 +208,7 @@ class Decoder(nn.Module):
             *list(full_decoder.children())[:44]
         )
     def forward(self, image):
-        return self.decoder(image).reshape(1,3,512,512)
+        return self.decoder(image)
 
 
 import matplotlib.pyplot as plt
