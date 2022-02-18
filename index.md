@@ -2,7 +2,6 @@
 layout: default
 ---
 
-{% include  stylizer.html %}
 
 Continue from [here](https://codepen.io/MR_RooT/pen/RwPErrB?editors=0010).
 
