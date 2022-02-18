@@ -2,6 +2,10 @@
 layout: default
 ---
 
+{% include  stylizer.html %}
+
+Continue from [here](https://codepen.io/MR_RooT/pen/RwPErrB?editors=0010).
+
 Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 [Link to another page](./another-page.html).
@@ -121,3 +125,4 @@ Long, single-line code blocks should not wrap. They should horizontally scroll i
 ```
 The final element.
 ```
+{% include footer.html %}
