@@ -1,4 +1,4 @@
-<div class="container"  style="width: 500px">
+<div class="container" style="width: 500px">
   <div class="row ">
     <div class="col-sm-6 imgUp">
       <div class="caption">
@@ -11,7 +11,7 @@
       </label>
     </div><!-- col-2 -->
     <!-- <i class="fa fa-plus imgAdd"></i> -->
-    
+
     <div class="col-sm-6 imgUp">
       <div class="caption">
         <p>Style Image</p>
@@ -24,17 +24,27 @@
     </div><!-- col-2 -->
     <!-- <i class="fa fa-plus imgAdd"></i> -->
 
-  </div><!-- row -->
-  
+  <!-- The output -->
+  <!-- Image zoom from: https://alt-web.com/TUTORIALS/?id=bootstrap_simple_image_zoom -->
   <div class="row">
-    <div class="col-sm-6  col-sm-offset-3">
-    <label class="btn btn-primary">
-      Stylize<input type="file" class="uploadFile img" value="Upload Photo"
-        style="width: 0px;height: 0px;overflow: hidden;">
-    </label>
-    </div>
-  </div><!-- row -->
-
-  
-
+    <div class="col-sm-offset-3 col-sm-6">
+      <!-- source: https://alt-web.com/TUTORIALS/?id=bootstrap_simple_image_zoom -->
+      <!-- <div class="imagePreview thumbnail zoom result-img"></div>     -->
+      <div class="imagePreview img-thumbnail zoom"></div>
+      
+      <label class="btn btn-primary" id="Stylize" disabled>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Stylizing...
+      </label>
+      <!-- There likely is a problem with bootstrap 3  spinners. 
+        Maybe not implemented until 4? -->
+        
+      <!-- <button class="btn btn-primary" type="button" id="Stylize" disabled>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Loading...
+        Stylize<input type="file" class="uploadFile img" value="Upload Photo"
+          style="width: 0px;height: 0px;overflow: hidden;">
+      </button> -->
+  </div>
+  <!-- end output -->
 </div><!-- container -->

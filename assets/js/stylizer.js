@@ -37,3 +37,28 @@ $(function () {
     }
   });
 });
+
+$(document).ready(function() {
+  $("#btnFetch").click(function() {
+    // disable button
+    $(this).prop("disabled", true);
+    // add spinner to button
+    $(this).html(
+      `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+    );
+  });
+});
+
+const delay = millis => new Promise((resolve, reject) => {
+  setTimeout(_ => resolve(), millis)
+});
+
+$('#Stylize').click(async function(){
+  console.log('YAY!');
+  $('#Stylize').attr('disabled', 'disabled');
+  
+  await delay(1000);
+	// if ($('#Stylize').is(':disabled')) {
+  $('#Stylize').removeAttr('disabled');
+  // }
+});
