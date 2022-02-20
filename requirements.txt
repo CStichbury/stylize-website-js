@@ -1,1 +1,8 @@
-Flask>=2.0.2
+git+https://github.com/onnx/onnx-tensorflow.git
+onnx-runtime
+tensorflow
+pytorch
+torchvision
+numpy
+matplotlib
+pillow
