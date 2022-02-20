@@ -149,7 +149,8 @@ async function getImage(img) {
 
 $(document).ready(async function() {
   // Load the model.
-  model = loadModel();
+  console.log('Hello');
+  model = await loadModel();
   console.log(model);
   console.log(model.summary());
   console.log(model.inputs);
@@ -161,16 +162,16 @@ async function loadModel() {
         console.log('Loading model...');
         model = await tf.loadGraphModel('assets/js/tfmodel/model.json');
         // Model warmup.
-        console.log('Warming up model...');
-        await model.executeAsync(
-            {
-                'content':tf.randomUniform([256,256,3], dtype ='float32'),
-                'style':tf.randomUniform([256,256,3], dtype ='float32'),
-                'iters':tf.scalar(1,'int32'),
-                'max_resolution':tf.scalar(128,'int32'),
-            },
-            ["result"]
-        ); 
+        // console.log('Warming up model...');
+        // await model.executeAsync(
+        //     {
+        //         'content':tf.randomUniform([256,256,3], dtype ='float32'),
+        //         'style':tf.randomUniform([256,256,3], dtype ='float32'),
+        //         'iters':tf.scalar(1,'int32'),
+        //         'max_resolution':tf.scalar(128,'int32'),
+        //     },
+        //     ["result"]
+        // ); 
     }
     return model
 }
