@@ -73,18 +73,18 @@ $(function () {
         // Save the image
         // console.log(oEvent.target);
 
-        const input_name = $(oEvent.target).attr('id').toString();
-        if(input_name.includes('Content')){
-          console.log('Content is in');
-          content_loaded = true;
-        } else if (input_name.includes('Style')){
-          console.log('Style is in');
-          style_loaded = true;
-        };
-        // If images are loaded, unlock the stylize button
-        if(content_loaded && style_loaded){
-          $('#Stylize').removeClass('disabled');
-        }
+        // const input_name = $(oEvent.target).attr('id').toString();
+        // if(input_name.includes('Content')){
+        //   console.log('Content is in');
+        //   content_loaded = true;
+        // } else if (input_name.includes('Style')){
+        //   console.log('Style is in');
+        //   style_loaded = true;
+        // };
+        // // If images are loaded, unlock the stylize button
+        // if(content_loaded && style_loaded){
+        //   $('#Stylize').removeClass('disabled');
+        // }
       };
     }
   });
