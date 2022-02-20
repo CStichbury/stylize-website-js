@@ -10,7 +10,8 @@ transform.tf2
 *.tf2
 models
 Untitled.ipynb
-
+index.html
+index.js
 
 # Logs
 logs
