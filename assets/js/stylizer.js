@@ -47,11 +47,11 @@ function isFileImage(file) {
   return file && $.inArray(file["type"], acceptedImageTypes);
 }
 
-let content_img = null;
-let style_img = null;
+var content_loaded = false;
+var style_loaded = false;
 
 $(function () {
-  $(document).on("change", ".uploadFile", function (e) {
+  $(document).on("change", ".uploadFile", function (oEvent) {
     var uploadFile = $(this);
     var files = !!this.files ? this.files : [];
     if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
@@ -59,26 +59,30 @@ $(function () {
     // if (isFileImage(files[0])) {
       var reader = new FileReader(); // instance of the FileReader
       reader.readAsDataURL(files[0]); // read the local file
-      reader.onloadend = function () {
+      reader.onloadend = function (e) {
         // set image data as background of div
         //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
         uploadFile
           .closest(".imgUp")
           .find(".imagePreview")
-          .css("background-image", "url(" + this.result + ")");
-          
+          .attr('src', e.target.result);
+          // .attr("src",""+this.result+"");
+          // .css("background-image", "url(" + this.result + ")");
+          // .attr("src","url(" + this.result + ")");
+          // .src = this.result;
         // Save the image
-        const input_name = $(e.target).attr('id').toString();
+        // console.log(oEvent.target);
 
+        const input_name = $(oEvent.target).attr('id').toString();
         if(input_name.includes('Content')){
           console.log('Content is in');
-          content_img = this.result;
+          content_loaded = true;
         } else if (input_name.includes('Style')){
           console.log('Style is in');
-          style_img = this.result;
+          style_loaded = true;
         };
         // If images are loaded, unlock the stylize button
-        if(content_img && style_img){
+        if(content_loaded && style_loaded){
           $('#Stylize').removeClass('disabled');
         }
       };
@@ -110,7 +114,7 @@ const delay = millis => new Promise((resolve, reject) => {
   setTimeout(_ => resolve(), millis)
 });
 
-const loading_state = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Stylizing...`
+const loading_state = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Stylizing...`
 
 $('#Stylize').click(async function(){
   const prev_state = $('#Stylize').html()
@@ -120,7 +124,8 @@ $('#Stylize').click(async function(){
   $('#Stylize').empty().append(loading_state);
 
   // await delay(1000);
-  await stylize()
+  // console.log(content_img, style_img, $('#Result'));
+  await stylize($('#ContentImage')[0], $('#StyleImage')[0], $('#Result')[0]);
   
   $('#Stylize').toggleClass('disabled');
 
@@ -131,8 +136,8 @@ $('#Stylize').click(async function(){
 
 let model = null;
 
-async function getImage(id) {
-    let img = document.getElementById(id)
+async function getImage(img) {
+    // let img = document.getElementById(id)
     
     img = tf.cast(tf.browser.fromPixels(img), 'float32');
 
@@ -142,10 +147,21 @@ async function getImage(id) {
     return img
 }
 
+$(document).ready(async function() {
+  // Load the model.
+  model = loadModel();
+  console.log(model);
+  console.log(model.summary());
+  console.log(model.inputs);
+  console.log(model.outputs);
+});
+
 async function loadModel() {
     if (model === null) {
-        model = await tf.loadGraphModel('static/model/model.json');
+        console.log('Loading model...');
+        model = await tf.loadGraphModel('assets/js/tfmodel/model.json');
         // Model warmup.
+        console.log('Warming up model...');
         await model.executeAsync(
             {
                 'content':tf.randomUniform([256,256,3], dtype ='float32'),
@@ -161,14 +177,16 @@ async function loadModel() {
 
 async function stylize(content_elem, style_elem, result_elem) {
     try {
-        console.log(tf.getBackend());
+        // console.log(tf.getBackend());
         const content = await getImage(content_elem)
         const style = await getImage(style_elem)
         const iters = tf.scalar(
-            document.getElementById('iters').value, 
+            // document.getElementById('iters').value, 
+            1,
             dtype='int32')
         const max_resolution = tf.scalar(
-            document.getElementById('max_resolution').value,
+            // document.getElementById('max_resolution').value,
+            256,
             dtype='int32')
         
         console.log(content, style);

@@ -4,7 +4,8 @@
       <div class="caption">
         <p>Content Image</p>
       </div>
-      <div class="imagePreview img-thumbnail"></div>
+      <img id='ContentImage' class="imagePreview img-thumbnail"
+        src="http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg"></img>
       <label class="btn btn-secondary btn-lg thumbnail-btn">
         Choose Content<input type="file" class="uploadFile img" id="ContentInput"
           style="width: 0px;height: 0px;overflow: hidden;">
@@ -16,7 +17,10 @@
       <div class="caption">
         <p>Style Image</p>
       </div>
-      <div class="imagePreview img-thumbnail"></div>
+      <!-- <div class="imagePreview img-thumbnail"></div> -->
+      <img id='StyleImage' class="imagePreview img-thumbnail"
+        src="http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg"></img>
+
       <label class="btn btn-secondary  btn-lg thumbnail-btn">
         Choose Style<input type="file" class="uploadFile img" id="StyleInput"
           style="width: 0px;height: 0px;overflow: hidden;">
@@ -30,9 +34,11 @@
       <div class="col-sm-offset-3 col-sm-6">
         <!-- source: https://alt-web.com/TUTORIALS/?id=bootstrap_simple_image_zoom -->
         <!-- <div class="imagePreview thumbnail zoom result-img"></div>     -->
-        <div class="imagePreview img-thumbnail zoom"></div>
+        <!-- <canvas id="Result" class="imagePreview img-thumbnail zoom"></canvas> -->
+        <canvas id="Result" class="imagePreview img-thumbnail zoom"
+          src="http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg"></canvas>
 
-        <label class="btn btn-primary btn-lg thumbnail-btn disabled" id="Stylize" data-bs-toggle="tooltip"
+        <label  id="Stylize" class="btn btn-primary btn-lg thumbnail-btn disabled" data-bs-toggle="tooltip"
           data-bs-placement="right" title="Tooltip on right">
           <!-- <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         Stylizing... -->
