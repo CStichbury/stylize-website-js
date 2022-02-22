@@ -3,5 +3,8 @@
 source "https://rubygems.org"
 
 gemspec
-gem 'bootstrap', '~> 4.0.0'
+gem 'bootstrap', '~> 5.0.0'
 gem "webrick", "~> 1.7"
+gem "jekyll"
+gem "jekyll-paginate"
+gem "jekyll-feed"
